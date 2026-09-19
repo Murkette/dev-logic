@@ -1,5 +1,8 @@
 @import "tailwindcss";
 @custom-variant desk (@media (min-width: 1024px) and (min-height: 680px));
+/* Result-state hero becomes sr-only below this viewport height so the result
+   card keeps its space without the page needing to scroll (see build spec §6.1). */
+@custom-variant compact (@media (max-height: 759px));
 
 :root {
   --bg: #FAF8F4;
@@ -9,6 +12,15 @@
   --line: #E7E2DA;
   --accent: #C2410C;
   --on-accent: #FFFFFF;
+
+  --risk-low-bg: #DCFCE7;
+  --risk-low-text: #166534;
+  --risk-medium-bg: #FEF3C7;
+  --risk-medium-text: #92400E;
+  --risk-high-bg: #FEE2E2;
+  --risk-high-text: #991B1B;
+  --risk-unknown-bg: #E7E5E4;
+  --risk-unknown-text: #44403C;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,7 +32,36 @@
     --line: #38322C;
     --accent: #FB923C;
     --on-accent: #171412;
+
+    --risk-low-bg: #14532D;
+    --risk-low-text: #BBF7D0;
+    --risk-medium-bg: #78350F;
+    --risk-medium-text: #FDE68A;
+    --risk-high-bg: #7F1D1D;
+    --risk-high-text: #FECACA;
+    --risk-unknown-bg: #44403C;
+    --risk-unknown-text: #E7E5E4;
   }
+}
+
+/* Always-light scope for the share card: it's rendered to a PNG and must read
+   the same regardless of the viewer's colour scheme. */
+.force-light {
+  --bg: #FAF8F4;
+  --surface: #FFFFFF;
+  --ink: #1C1917;
+  --muted: #6B645C;
+  --line: #E7E2DA;
+  --accent: #C2410C;
+  --on-accent: #FFFFFF;
+  --risk-low-bg: #DCFCE7;
+  --risk-low-text: #166534;
+  --risk-medium-bg: #FEF3C7;
+  --risk-medium-text: #92400E;
+  --risk-high-bg: #FEE2E2;
+  --risk-high-text: #991B1B;
+  --risk-unknown-bg: #E7E5E4;
+  --risk-unknown-text: #44403C;
 }
 
 @theme inline {
@@ -31,9 +72,39 @@
   --color-line: var(--line);
   --color-accent: var(--accent);
   --color-on-accent: var(--on-accent);
+  --color-risk-low-bg: var(--risk-low-bg);
+  --color-risk-low-text: var(--risk-low-text);
+  --color-risk-medium-bg: var(--risk-medium-bg);
+  --color-risk-medium-text: var(--risk-medium-text);
+  --color-risk-high-bg: var(--risk-high-bg);
+  --color-risk-high-text: var(--risk-high-text);
+  --color-risk-unknown-bg: var(--risk-unknown-bg);
+  --color-risk-unknown-text: var(--risk-unknown-text);
 }
 
 body {
   background: var(--color-bg);
   color: var(--color-ink);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes slide-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-slide-in {
+    animation: slide-in 200ms ease-out;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-in {
+    animation: none;
+  }
 }

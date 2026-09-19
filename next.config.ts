@@ -7,10 +7,12 @@ const securityHeaders = [
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
   {
     key: 'Content-Security-Policy',
+    // 'unsafe-eval' only in dev: next dev's HMR runtime evals its own chunks,
+    // which a strict production CSP (rightly) forbids.
     value:
-      "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; " +
-      "img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; " +
-      "frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+      `default-src 'self'; script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === 'production' ? '' : " 'unsafe-eval'"}; ` +
+      "style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; " +
+      "connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
   },
 ];
 

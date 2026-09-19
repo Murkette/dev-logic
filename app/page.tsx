@@ -1,7 +1,15 @@
+import { SiteHeader } from '@/components/SiteHeader';
+import { SiteFooter } from '@/components/SiteFooter';
+import { Translator } from '@/components/Translator';
+
 export default function HomePage() {
   return (
-    <main className="min-h-dvh flex items-center justify-center">
-      <p className="text-muted">Client-Speak Translator — under construction (M0 scaffold).</p>
-    </main>
+    <div className="flex min-h-dvh flex-col desk:h-dvh desk:overflow-hidden">
+      <SiteHeader />
+      <main className="mx-auto flex w-full max-w-[760px] flex-1 min-h-0 flex-col px-4 py-2">
+        <Translator />
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

@@ -5,10 +5,9 @@ import { translations } from '@/db/schema';
 import { bump } from '@/lib/counters';
 import { rateLimit } from '@/lib/rate-limit';
 import { getClientIp } from '@/lib/ip';
+import { isUuid, cleanText } from '@/lib/validate';
 
 export const dynamic = 'force-dynamic';
-
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function errorResponse(code: string, status: number, retryAfterSec?: number) {
   const headers: Record<string, string> = {};
@@ -29,9 +28,9 @@ export async function POST(req: Request) {
   }
 
   const { text, sessionId } = (body ?? {}) as { text?: unknown; sessionId?: unknown };
-  const trimmed = typeof text === 'string' ? text.trim() : '';
-  if (trimmed.length < 1 || trimmed.length > 400) return errorResponse('invalid_input', 400);
-  if (typeof sessionId !== 'string' || !UUID_RE.test(sessionId)) return errorResponse('invalid_input', 400);
+  const trimmed = cleanText(text, 400);
+  if (!trimmed) return errorResponse('invalid_input', 400);
+  if (!isUuid(sessionId)) return errorResponse('invalid_input', 400);
 
   try {
     const engine = await getEngine();
