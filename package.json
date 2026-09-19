@@ -1,0 +1,41 @@
+{
+  "name": "client-speak-translator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "tsx db/seed/index.ts",
+    "seed:check": "tsx db/seed/validate.ts"
+  },
+  "dependencies": {
+    "next": "^15.5.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "drizzle-orm": "^0.44.6",
+    "postgres": "^3.4.7",
+    "fuse.js": "^7.1.0",
+    "nodemailer": "^7.0.9",
+    "html-to-image": "^1.11.13"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.2.3",
+    "@types/react-dom": "^19.2.3",
+    "@types/nodemailer": "^6.4.20",
+    "tailwindcss": "^4.1.16",
+    "@tailwindcss/postcss": "^4.1.16",
+    "drizzle-kit": "^0.31.5",
+    "tsx": "^4.20.6",
+    "eslint": "^9.38.0",
+    "eslint-config-next": "^15.5.4"
+  }
+}

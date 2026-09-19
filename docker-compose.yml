@@ -1,0 +1,67 @@
+x-logging: &logging
+  driver: json-file
+  options: { max-size: "10m", max-file: "3" }
+
+x-build: &build
+  context: .
+  args:
+    SITE_URL: ${SITE_URL}
+    PAID_APP_URL: ${PAID_APP_URL}
+    COMPANY_NAME: ${COMPANY_NAME}
+
+services:
+  app:
+    build: *build
+    env_file: .env
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    expose: ["3000"]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging: *logging
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cst
+      POSTGRES_DB: cst
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cst -d cst"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging: *logging
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports: ["80:80", "443:443", "443:443/udp"]
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [app]
+    logging: *logging
+
+  tools:
+    profiles: ["tools"]
+    build:
+      <<: *build
+      target: builder
+    env_file: .env
+    depends_on:
+      db: { condition: service_healthy }
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:
