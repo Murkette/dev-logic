@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { ResultCard } from './ResultCard';
+import { EmailBar } from './EmailBar';
 import type { Risk } from './RiskBadge';
 import { EXAMPLE_PHRASES, HERO_LINE } from '@/lib/site';
-import { getSessionId, incrementTranslationCount } from '@/lib/client/session';
+import { getSessionId, getTranslationCount, incrementTranslationCount } from '@/lib/client/session';
 
 type TranslateResponse = {
   matched: boolean;
@@ -36,6 +37,7 @@ export function Translator() {
   const [translatedText, setTranslatedText] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const [txCount, setTxCount] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const hasContent = status !== 'idle';
@@ -45,6 +47,10 @@ export function Translator() {
     if (window.matchMedia('(min-width: 1024px)').matches) {
       textareaRef.current?.focus();
     }
+    // Picks up a count from earlier in the same tab session (e.g. after a
+    // refresh), since the bar's eligibility is defined against the stored
+    // count, not just translations made since this component mounted.
+    setTxCount(getTranslationCount());
   }, []);
 
   useEffect(() => {
@@ -84,7 +90,7 @@ export function Translator() {
       setResult(data);
       setTranslatedText(trimmed);
       setStatus('result');
-      if (data.matched) incrementTranslationCount();
+      if (data.matched) setTxCount(incrementTranslationCount());
     } catch {
       setStatus('error');
       setErrorMessage('Something broke on our end. Try again.');
@@ -176,6 +182,8 @@ export function Translator() {
           />
         ) : null}
       </div>
+
+      <EmailBar txCount={txCount} />
     </div>
   );
 }

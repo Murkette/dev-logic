@@ -7,6 +7,22 @@ import { phrases } from '@/db/schema';
 import { sql } from 'drizzle-orm';
 import { collectAllSeedPhrases, runValidation } from './validate';
 
+// The brief's ten original tone-setting examples, in that order — inserted
+// first (on a fresh DB) so they land at ids 1-10 and become the /library
+// "free sample" (see docs/build-spec.md §12 and its repo-map note on this file).
+const FREE_SAMPLE_SLUGS = [
+  'make-it-pop',
+  'know-it-when-i-see-it',
+  'something-feels-off',
+  'brother-nephew-friend-thinks',
+  'just-a-small-change',
+  'add-a-blog-shop-booking',
+  'diy-builder-is-free',
+  'when-will-it-be-done',
+  'make-the-logo-bigger',
+  'hold-off-until-perfect',
+];
+
 async function seed() {
   const { ok, counts, total } = runValidation();
   console.table(counts);
@@ -17,7 +33,16 @@ async function seed() {
   }
 
   const force = process.argv.includes('--force');
-  const all = collectAllSeedPhrases();
+  const allPhrases = collectAllSeedPhrases();
+  const bySlug = new Map(allPhrases.map((p) => [p.slug, p]));
+  const freeSample = FREE_SAMPLE_SLUGS.map((slug) => {
+    const p = bySlug.get(slug);
+    if (!p) throw new Error(`FREE_SAMPLE_SLUGS references unknown slug "${slug}"`);
+    return p;
+  });
+  const freeSampleSet = new Set(FREE_SAMPLE_SLUGS);
+  const rest = allPhrases.filter((p) => !freeSampleSet.has(p.slug));
+  const all = [...freeSample, ...rest];
 
   const query = db()
     .insert(phrases)
