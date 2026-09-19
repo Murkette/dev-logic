@@ -6,6 +6,9 @@ const DAY_SEC = 24 * 60 * 60;
 export const LIB_COOKIE = 'cst_lib';
 export const LIB_MAX_AGE_SEC = 90 * DAY_SEC;
 
+export const ADMIN_COOKIE = 'cst_admin';
+export const ADMIN_MAX_AGE_SEC = 7 * DAY_SEC;
+
 function hmac(payload: string): Buffer {
   return createHmac('sha256', env().COOKIE_SECRET).update(payload).digest();
 }
@@ -63,6 +66,14 @@ export function verifyLibToken(token: string | undefined | null): { leadId: numb
   if (!parts) return null;
   const leadId = Number(parts[0]);
   return Number.isFinite(leadId) ? { leadId } : null;
+}
+
+export function signAdminToken(): string {
+  return sign('admin', [Math.floor(Date.now() / 1000)]);
+}
+
+export function verifyAdminToken(token: string | undefined | null): boolean {
+  return verify('admin', token, ADMIN_MAX_AGE_SEC) !== null;
 }
 
 export function signUnsubToken(leadId: number): string {

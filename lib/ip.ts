@@ -1,9 +1,18 @@
+import { headers } from 'next/headers';
 import { env } from './env';
 
+function firstForwardedIp(xff: string | null): string {
+  return xff ? xff.split(',')[0]!.trim() : '0.0.0.0';
+}
+
 export function getClientIp(req: Request): string {
-  const xff = req.headers.get('x-forwarded-for');
-  if (xff) return xff.split(',')[0]!.trim();
-  return '0.0.0.0';
+  return firstForwardedIp(req.headers.get('x-forwarded-for'));
+}
+
+// Server actions have no Request object to read headers from.
+export async function getClientIpFromHeaders(): Promise<string> {
+  const h = await headers();
+  return firstForwardedIp(h.get('x-forwarded-for'));
 }
 
 export async function hashIp(ip: string): Promise<string> {
